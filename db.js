@@ -10,26 +10,15 @@ mongoose.connect('mongodb://localhost:27017/test')
 const userinfoSchema = new mongoose.Schema({
     openid: {
         type: String,
+        required: true
     },
     name: String,
     eid: String,
     wechat: String,
     role: Boolean,
+    photo: String // 添加照片路径字段
 });
 
-
-
 const Userinfo = mongoose.model('Userinfo', userinfoSchema);
-
-//Test to create a new user
-/** 
-Userinfo.create({
-    openid: '123',
-    name: 'rkan',
-    eid: 'asd123',
-    wechat: 'rkasdfaan',
-    role: true
-})
-*/
 
 module.exports = Userinfo;
