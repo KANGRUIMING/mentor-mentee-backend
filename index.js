@@ -77,7 +77,9 @@ app.post('/upload', upload.single('photo'), async (req, res) => {
     eid,
     wechat,
     role: role === 'teacher', // 假设 'teacher' 表示老师
-    photo: targetPath // 保存照片路径到数据库
+    photo: targetPath, // 保存照片路径到数据库
+    year,
+    major
   });
 
   try {
@@ -87,6 +89,21 @@ app.post('/upload', upload.single('photo'), async (req, res) => {
   } catch (err) {
     console.error('Error saving new user to MongoDB', err);
     res.status(500).send('Error occurred while saving new user to MongoDB');
+  }
+});
+
+app.post('/getuserinfo', async (req, res) => {
+  const { openid } = req.body;
+  try {
+    const user = await Userinfo.findOne({ openid: openid }).exec();
+    if (user) {
+      res.json({ success: true, user: user });
+    } else {
+      res.json({ success: false, message: '用户不存在' });
+    }
+  } catch (err) {
+    console.error('Error retrieving user information from MongoDB', err);
+    res.status(500).send('Error occurred while retrieving user information');
   }
 });
 
