@@ -64,7 +64,7 @@ app.post('/checkuser', async (req, res) => {
 });
 
 app.post('/upload', upload.single('photo'), async (req, res) => {
-  const { name, eid, year, major, role, openid } = req.body;
+  const { name, eid, year, major, wechat, role, openid } = req.body;
   const photo = req.file;
 
   // 处理上传的文件和其他信息
@@ -75,7 +75,7 @@ app.post('/upload', upload.single('photo'), async (req, res) => {
     openid,
     name,
     eid,
-    wechat: 'test_wechat', // 根据需要修改或获取真实的 wechat 信息
+    wechat,
     role: role === 'teacher', // 假设 'teacher' 表示老师
     photo: targetPath // 保存照片路径到数据库
   });
