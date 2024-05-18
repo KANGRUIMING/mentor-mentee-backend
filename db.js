@@ -16,7 +16,9 @@ const userinfoSchema = new mongoose.Schema({
     eid: String,
     wechat: String,
     role: Boolean,
-    photo: String // 添加照片路径字段
+    photo: String,
+    year: String, // 添加学年/职称字段
+    major: String // 添加专业/科研方向字段
 });
 
 const Userinfo = mongoose.model('Userinfo', userinfoSchema);
