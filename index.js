@@ -5,6 +5,7 @@ const querystring = require('querystring');
 const multer = require('multer');
 const fs = require('fs');
 const Userinfo = require('./db'); // 从 ./db 导入 Userinfo 模型
+const config = require('./config'); // 引入配置文件
 
 const app = express();
 const port = 3000;
@@ -24,28 +25,28 @@ app.get('/', (req, res) => {
 app.get('/getopenid', (req, res) => {
   console.log(req.query.code);
   var data = {
-    appid: 'wx727c90bddef1bfc3', // 你的微信小程序appid
-    secret: 'eb166d0eecc4dd0472a1789118ce6a5a', // 你的微信小程序secret密钥
+    appid: config.appid, // 从配置文件中获取appid
+    secret: config.secret, // 从配置文件中获取secret密钥
     js_code: req.query.code,
     grant_type: 'authorization_code'
   };
-  
+
   console.log(data);
-  
+
   var content = querystring.stringify(data);
   var url = 'https://api.weixin.qq.com/sns/jscode2session?' + content;
-  
+
   request.get({ url: url }, (error, response, body) => {
     if (error) {
       console.error(error);
       res.status(500).send('Error occurred while fetching openid');
       return;
     }
-  
+
     let result = JSON.parse(body);
     result.code = req.query.code;
     console.log(result);
-  
+
     // 发送JSON格式数据
     res.json(result);
   });
