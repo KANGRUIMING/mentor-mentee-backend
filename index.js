@@ -14,6 +14,9 @@ app.use(bodyParser.json());
 
 const upload = multer({ dest: 'uploads/' });
 
+// 提供静态文件
+app.use('/uploads', express.static('uploads'));
+
 app.get('/', (req, res) => {
   res.send('Hello World Express!');
 });
@@ -67,29 +70,40 @@ app.post('/upload', upload.single('photo'), async (req, res) => {
   const { name, eid, year, major, wechat, role, openid } = req.body;
   const photo = req.file;
 
+  if (!photo) {
+    res.status(400).send('No photo uploaded');
+    return;
+  }
+
   // 处理上传的文件和其他信息
   const targetPath = `uploads/${photo.originalname}`;
-  fs.renameSync(photo.path, targetPath);
+  fs.rename(photo.path, targetPath, async (err) => {
+    if (err) {
+      console.error('Error renaming file', err);
+      res.status(500).send('Error occurred while processing the photo');
+      return;
+    }
 
-  const newUser = new Userinfo({
-    openid,
-    name,
-    eid,
-    wechat,
-    role: role === 'teacher', // 假设 'teacher' 表示老师
-    photo: targetPath, // 保存照片路径到数据库
-    year,
-    major
+    const newUser = new Userinfo({
+      openid,
+      name,
+      eid,
+      wechat,
+      role: role === 'teacher', // 假设 'teacher' 表示老师
+      photo: targetPath, // 保存照片路径到数据库
+      year,
+      major
+    });
+
+    try {
+      await newUser.save();
+      console.log('New user saved to MongoDB');
+      res.send({ status: 'success', message: '信息提交成功' });
+    } catch (err) {
+      console.error('Error saving new user to MongoDB', err);
+      res.status(500).send('Error occurred while saving new user to MongoDB');
+    }
   });
-
-  try {
-    await newUser.save();
-    console.log('New user saved to MongoDB');
-    res.send({ status: 'success', message: '信息提交成功' });
-  } catch (err) {
-    console.error('Error saving new user to MongoDB', err);
-    res.status(500).send('Error occurred while saving new user to MongoDB');
-  }
 });
 
 app.post('/getuserinfo', async (req, res) => {
