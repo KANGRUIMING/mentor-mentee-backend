@@ -55,7 +55,7 @@ app.get('/getopenid', (req, res) => {
 app.post('/checkuser', async (req, res) => {
   const { openid } = req.body;
   try {
-    const user = await Userinfo.findOne({ openid: openid }).exec();
+    const user = await Userinfo.findOne({ openid }).exec();
     if (user) {
       res.json({ exists: true });
     } else {
@@ -110,9 +110,9 @@ app.post('/upload', upload.single('photo'), async (req, res) => {
 app.post('/getuserinfo', async (req, res) => {
   const { openid } = req.body;
   try {
-    const user = await Userinfo.findOne({ openid: openid }).exec();
+    const user = await Userinfo.findOne({ openid }).exec();
     if (user) {
-      res.json({ success: true, user: user });
+      res.json({ success: true, user });
     } else {
       res.json({ success: false, message: '用户不存在' });
     }
@@ -126,7 +126,7 @@ app.post('/getuserinfo', async (req, res) => {
 app.get('/students', async (req, res) => {
   try {
     const students = await Userinfo.find({ role: false }).exec(); // 假设 role 为 false 表示学生
-    res.json({ success: true, students: students });
+    res.json({ success: true, students });
   } catch (err) {
     console.error('Error retrieving students information from MongoDB', err);
     res.status(500).send('Error occurred while retrieving students information');
@@ -137,10 +137,51 @@ app.get('/students', async (req, res) => {
 app.get('/student/:id', async (req, res) => {
   try {
     const student = await Userinfo.findById(req.params.id).exec();
-    res.json({ success: true, student: student });
+    res.json({ success: true, student });
   } catch (err) {
     console.error('Error retrieving student information from MongoDB', err);
     res.status(500).send('Error occurred while retrieving student information');
+  }
+});
+
+// 新增更新用户信息的路由
+app.post('/updateuserinfo', upload.fields([{ name: 'newPhoto' }, { name: 'otherInfoImage' }]), async (req, res) => {
+  const { openid, name, eid, year, major, wechat, otherInfoText } = req.body;
+  const newPhoto = req.files['newPhoto'] ? req.files['newPhoto'][0] : null;
+  const otherInfoImage = req.files['otherInfoImage'] ? req.files['otherInfoImage'][0] : null;
+
+  try {
+    const updateData = {
+      name,
+      eid,
+      year,
+      major,
+      wechat,
+      otherInfo: { text: otherInfoText }
+    };
+
+    if (newPhoto) {
+      const targetPath = `uploads/${newPhoto.originalname}`;
+      fs.renameSync(newPhoto.path, targetPath);
+      updateData.photo = targetPath;
+    }
+
+    if (otherInfoImage) {
+      const targetPath = `uploads/${otherInfoImage.originalname}`;
+      fs.renameSync(otherInfoImage.path, targetPath);
+      updateData.otherInfo.image = targetPath;
+    }
+
+    const user = await Userinfo.findOneAndUpdate(
+      { openid },
+      { $set: updateData },
+      { new: true }
+    ).exec();
+
+    res.json({ success: true, user });
+  } catch (err) {
+    console.error('Error updating user information in MongoDB', err);
+    res.status(500).send('Error occurred while updating user information');
   }
 });
 

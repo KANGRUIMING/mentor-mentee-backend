@@ -18,7 +18,11 @@ const userinfoSchema = new mongoose.Schema({
     role: Boolean,
     photo: String,
     year: String, // 添加学年/职称字段
-    major: String // 添加专业/科研方向字段
+    major: String, // 添加专业/科研方向字段
+    otherInfo: { // 添加其他信息字段
+        text: String,
+        image: String
+    }
 });
 
 const Userinfo = mongoose.model('Userinfo', userinfoSchema);
