@@ -133,6 +133,17 @@ app.get('/students', async (req, res) => {
   }
 });
 
+// 新增获取所有导师信息的路由
+app.get('/teachers', async (req, res) => {
+  try {
+    const teachers = await Userinfo.find({ role: true }).exec(); // 假设 role 为 true 表示导师
+    res.json({ success: true, teachers });
+  } catch (err) {
+    console.error('Error retrieving teachers information from MongoDB', err);
+    res.status(500).send('Error occurred while retrieving teachers information');
+  }
+});
+
 // 新增获取单个学生详细信息的路由
 app.get('/student/:id', async (req, res) => {
   try {
@@ -141,6 +152,17 @@ app.get('/student/:id', async (req, res) => {
   } catch (err) {
     console.error('Error retrieving student information from MongoDB', err);
     res.status(500).send('Error occurred while retrieving student information');
+  }
+});
+
+// 新增获取单个导师详细信息的路由
+app.get('/teacher/:id', async (req, res) => {
+  try {
+    const teacher = await Userinfo.findById(req.params.id).exec();
+    res.json({ success: true, teacher });
+  } catch (err) {
+    console.error('Error retrieving teacher information from MongoDB', err);
+    res.status(500).send('Error occurred while retrieving teacher information');
   }
 });
 
