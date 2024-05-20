@@ -1,4 +1,4 @@
-# Mentor-Mentee WeChat Mini Program Backend Code
+# Mentor-Mentee WeChat Mini Program Backend
 
 [点击此处查看中文介绍](#项目简介)
 
