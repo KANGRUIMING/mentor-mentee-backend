@@ -122,6 +122,28 @@ app.post('/getuserinfo', async (req, res) => {
   }
 });
 
+// 新增获取所有学生信息的路由
+app.get('/students', async (req, res) => {
+  try {
+    const students = await Userinfo.find({ role: false }).exec(); // 假设 role 为 false 表示学生
+    res.json({ success: true, students: students });
+  } catch (err) {
+    console.error('Error retrieving students information from MongoDB', err);
+    res.status(500).send('Error occurred while retrieving students information');
+  }
+});
+
+// 新增获取单个学生详细信息的路由
+app.get('/student/:id', async (req, res) => {
+  try {
+    const student = await Userinfo.findById(req.params.id).exec();
+    res.json({ success: true, student: student });
+  } catch (err) {
+    console.error('Error retrieving student information from MongoDB', err);
+    res.status(500).send('Error occurred while retrieving student information');
+  }
+});
+
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
